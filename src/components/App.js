@@ -1,52 +1,28 @@
 import React from 'react';
-import SeasonDisplay from './SeasonDisplay';
+import unsplash from '../api/unsplash';
+import SearchBar from './searchbar';
+import ImageList from './imageList';
+import imageList from './imageList';
 
-// const App = ()=>{
-//     navigator.geolocation.getCurrentPosition((position)=>console.log(position.coords.latitude),(error)/////// //=>console.log(error));
-//     return <div><SeasonDisplay latitude={position.coords.latitude}/></div>
-// }
-
-
-class App extends React.Component{
-    constructor(props){
-        super(props);
-        this.state={latitude:null , errorMessage:""};
-        navigator.geolocation.getCurrentPosition(
-            (position)=>{
-                this.setState({
-                    latitude:position.coords.latitude
-                })
+class App extends React.Component {
+    state = {imageList : []}
+    handleSearchSubmit =async (term)=>{
+        const response = await unsplash.get("/search/photos",{
+            params:{
+                query:term,
             },
-            (error)=>{
-                this.setState({
-                    errorMessage:error.message
-                })
-            }
-        );
-    }
-    render(){
-
-        if(this.state.latitude && !this.state.errorMessage){
-            
-            return(
-                <SeasonDisplay latitude={this.state.latitude}/>
-                
-            );
-        }
-        else if(!this.state.latitude && this.state.errorMessage){
-            return(
-                <div>
-                    <h1>errorMessage  : {this.state.errorMessage}</h1>
-                </div>
-            );
-        }
-        
-        return(
-            <div>
-                <h1>loading</h1>
-            </div>
-        );
+        });
+        this.setState({imageList:response.data.results});
     };
+
+    render(){    
+        return <div>
+            <SearchBar searchSubmit = {this.handleSearchSubmit}/>
+            <ImageList imageList = {this.state.imageList}/>
+        </div>
+    }
     
+
 }
-export default App; 
+
+export default App;
